@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vagas em bancos, corretoras e cooperativas</title>
+<style>
+:root{color-scheme:light dark;--bg:#f4f5f8;--card:#fff;--tx:#141a2a;--mut:#5b6478;--bd:#d9dde6;--ac:#2457f5;--acx:#fff;--hi:#fff1c7;--hix:#6b4a00}
+@media (prefers-color-scheme:dark){:root{--bg:#0e121c;--card:#171c29;--tx:#eceff6;--mut:#98a2b8;--bd:#283042;--ac:#7b9bff;--acx:#0b1330;--hi:#3a2f0b;--hix:#ffd877}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:980px;margin:0 auto;padding:20px 14px 48px}
+h1{font-size:24px;margin:0 0 2px;letter-spacing:-.01em}
+.sub{color:var(--mut);margin:0 0 16px}
+.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:10px}
+label{display:block;font-size:12px;color:var(--mut);margin-bottom:3px}
+select,input[type=search],input[type=text]{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.chk{display:flex;gap:8px;align-items:center;margin:4px 0 14px;font-size:14px}
+.bar{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:var(--mut);font-size:13px;margin-bottom:8px}
+.v{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.v h3{margin:0;font-size:16px}
+.m{color:var(--mut);font-size:13px}
+.tg{display:inline-block;font-size:12px;padding:1px 8px;border-radius:999px;border:1px solid var(--bd);margin:6px 4px 0 0}
+.tg.h{background:var(--hi);color:var(--hix);border-color:transparent}
+a.b{display:inline-block;padding:8px 13px;border-radius:8px;background:var(--ac);color:var(--acx);text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap}
+a.s{display:inline-block;padding:6px 10px;border:1px solid var(--bd);border-radius:8px;color:var(--tx);text-decoration:none;font-size:13px;margin:4px 4px 0 0;background:var(--card)}
+button{padding:9px 14px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;cursor:pointer}
+.empty{background:var(--card);border:1px dashed var(--bd);border-radius:10px;padding:18px;color:var(--mut)}
+details{margin-top:24px}summary{cursor:pointer;font-weight:600}
+.inst{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-top:10px}
+.inst div{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px}
+@media(max-width:560px){.v{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>Vagas em bancos, corretoras e cooperativas</h1>
+<p class="sub" id="upd">Carregando vagas…</p>
+<p class="m" style="margin:-8px 0 14px">Só vagas publicadas no Gupy, conferidas todo dia: a descrição e a candidatura ficam na própria página da vaga, sem redirecionamento.</p>
+
+<div class="f">
+<div><label for="q">Buscar cargo ou instituição</label><input id="q" type="search" placeholder="Ex.: assessor, Sicoob"></div>
+<div><label for="area">Carreira</label><select id="area"></select></div>
+<div><label for="uf">Estado</label><select id="uf"></select></div>
+<div><label for="cid">Cidade</label><input id="cid" type="text" placeholder="Ex.: Volta Redonda"></div>
+<div><label for="tipo">Tipo</label><select id="tipo"><option value="">Todos</option><option>Banco</option><option>Corretora</option><option>Cooperativa</option></select></div>
+<div><label for="nivel">Nível</label><select id="nivel"><option value="">Todos</option><option>Entrada</option><option>Com experiência</option></select></div>
+</div>
+<label class="chk"><input type="checkbox" id="cpa"> Só vagas que mencionam CPA / CEA / ANBIMA</label>
+
+<div class="bar"><span id="cnt"></span><span>Mais recentes primeiro</span></div>
+<div id="lista"></div>
+<p><button id="mais" hidden>Mostrar mais vagas</button></p>
+
+<details>
+<summary>Buscar direto nos sites (todas as instituições)</summary>
+<p class="m">Abre a busca já filtrada com a carreira, o estado e a cidade escolhidos acima.</p>
+<div class="inst" id="inst"></div>
+</details>
+</div>
+
+<script>
+const AREAS=["Todas","Assessor de investimentos","Gerente de relacionamento","Atendimento / Caixa","Comercial / Vendas","Operações / Backoffice","Crédito / Cobrança","Risco / Compliance","Tesouraria / Mesa","Tecnologia","Estágio","Trainee / Jovem aprendiz","Outras"];
+const UFS={"":"Todo o Brasil",AC:"Acre",AL:"Alagoas",AP:"Amapá",AM:"Amazonas",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",GO:"Goiás",MA:"Maranhão",MT:"Mato Grosso",MS:"Mato Grosso do Sul",MG:"Minas Gerais",PA:"Pará",PB:"Paraíba",PR:"Paraná",PE:"Pernambuco",PI:"Piauí",RJ:"Rio de Janeiro",RN:"Rio Grande do Norte",RS:"Rio Grande do Sul",RO:"Rondônia",RR:"Roraima",SC:"Santa Catarina",SP:"São Paulo",SE:"Sergipe",TO:"Tocantins"};
+const INST=[["Banco do Brasil","Banco"],["Caixa","Banco"],["Itaú","Banco"],["Bradesco","Banco"],["Santander","Banco"],["BTG Pactual","Banco"],["Safra","Banco"],["Banrisul","Banco"],["Banco do Nordeste","Banco"],["Banco Inter","Banco"],["C6 Bank","Banco"],["Nubank","Banco"],["Banco Pan","Banco"],["Banco BV","Banco"],["Daycoval","Banco"],["Banco Mercantil","Banco"],["XP Investimentos","Corretora"],["Rico","Corretora"],["Clear","Corretora"],["Ágora","Corretora"],["Genial","Corretora"],["Warren","Corretora"],["Modal","Corretora"],["Órama","Corretora"],["Toro","Corretora"],["Guide","Corretora"],["Nu Invest","Corretora"],["Sicredi","Cooperativa"],["Sicoob","Cooperativa"],["Cresol","Cooperativa"],["Unicred","Cooperativa"],["Ailos","Cooperativa"],["Credisis","Cooperativa"],["Cooperforte","Cooperativa"]];
+const $=id=>document.getElementById(id), e=encodeURIComponent;
+const norm=t=>(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+$("area").innerHTML=AREAS.map(a=>`<option>${a}</option>`).join("");
+$("uf").innerHTML=Object.entries(UFS).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
+let ALL=[],shown=30;
+const nome=v=>v.instituicao||v.empresa;
+
+async function load(){
+ try{
+  const r=await fetch("vagas.json?"+Date.now());if(!r.ok)throw 0;
+  const d=await r.json();ALL=d.vagas||[];
+  const dt=d.atualizado_em?new Date(d.atualizado_em):null;
+  $("upd").textContent=dt?`Atualizado em ${dt.toLocaleDateString("pt-BR")} às ${dt.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})} · ${ALL.length} vagas`:"";
+ }catch(x){$("upd").textContent="Ainda não há vagas coletadas. Rode a coleta pela aba Actions do GitHub.";}
+ render();
+}
+function filtrar(){
+ const q=norm($("q").value),a=$("area").value,u=$("uf").value,c=norm($("cid").value.trim()),t=$("tipo").value,n=$("nivel").value,p=$("cpa").checked;
+ return ALL.filter(v=>(!q||norm(v.cargo+" "+nome(v)).includes(q))&&(a==="Todas"||v.area===a)&&(!u||v.uf===u)&&(!c||norm(v.cidade).includes(c))&&(!t||v.tipo===t)&&(!n||v.nivel===n)&&(!p||v.cpa));
+}
+function fmtData(s){if(!s)return"";const[y,m,d]=s.split("-");return `${d}/${m}/${y}`}
+function render(){
+ const L=filtrar();$("cnt").textContent=L.length+" vagas";
+ $("lista").innerHTML=L.length?L.slice(0,shown).map(v=>`<div class="v"><div><h3>${esc(v.cargo)}</h3><div class="m">${esc(nome(v))}${v.cidade||v.uf?" — "+esc([v.cidade,v.uf].filter(Boolean).join("/")):""}${v.data?" — publicada em "+fmtData(v.data):""}</div>
+ <span class="tg">${v.tipo}</span><span class="tg">${v.area}</span><span class="tg ${v.nivel==="Entrada"?"h":""}">${v.nivel}</span>${v.cpa?'<span class="tg h">Menciona CPA/ANBIMA</span>':""}${v.salario?`<span class="tg">A partir de R$ ${Math.round(v.salario).toLocaleString("pt-BR")}</span>`:""}${v.prazo?`<span class="tg">Inscrições até ${fmtData(v.prazo)}</span>`:""}${v.remoto?'<span class="tg">Remoto</span>':""}${v.resumo?`<div class="m" style="margin-top:8px">${esc(v.resumo.slice(0,220))}${v.resumo.length>220?"…":""}</div>`:""}</div>
+ <a class="b" target="_blank" rel="noopener" href="${esc(v.url)}">Ver descrição e candidatar</a></div>`).join(""):`<div class="empty">Nenhuma vaga com esses filtros. Tire algum filtro ou use as buscas diretas nos sites, mais abaixo.</div>`;
+ $("mais").hidden=L.length<=shown;
+ const loc=[$("cid").value.trim(),UFS[$("uf").value]&&$("uf").value?UFS[$("uf").value]:""].filter(Boolean).join(", ");
+ const ar=$("area").value==="Todas"?"":$("area").value;
+ $("inst").innerHTML=INST.filter(([,t])=>!$("tipo").value||t===$("tipo").value).map(([n,t])=>{const kw=[n,ar].filter(Boolean).join(" ");
+  return `<div><strong>${n}</strong><div class="m">${t}</div>
+  <a class="s" target="_blank" rel="noopener" href="https://www.linkedin.com/jobs/search/?keywords=${e(kw)}&location=${e((loc||"")+(loc?", ":"")+"Brasil")}">LinkedIn</a>
+  <a class="s" target="_blank" rel="noopener" href="https://br.indeed.com/jobs?q=${e(kw)}&l=${e(loc)}">Indeed</a>
+  <a class="s" target="_blank" rel="noopener" href="https://portal.gupy.io/job-search/term=${e(kw)}">Gupy</a>
+  <a class="s" target="_blank" rel="noopener" href="https://www.google.com/search?q=${e(n+" trabalhe conosco vagas "+loc)}">Site oficial</a></div>`}).join("");
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+["q","area","uf","cid","tipo","nivel","cpa"].forEach(i=>$(i).addEventListener("input",()=>{shown=30;render()}));
+$("mais").onclick=()=>{shown+=30;render()};
+load();
+</script>
+</body>
+</html>

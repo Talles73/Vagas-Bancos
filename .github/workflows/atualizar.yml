@@ -1,0 +1,27 @@
+name: Atualizar vagas
+on:
+  schedule:
+    - cron: "0 9 * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install requests
+      - name: Coletar vagas
+        env:
+          ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
+        run: python collect.py
+      - name: Salvar resultado
+        run: |
+          git config user.name "vagas-bot"
+          git config user.email "vagas-bot@users.noreply.github.com"
+          git add docs/vagas.json
+          git diff --cached --quiet || git commit -m "Atualiza vagas $(date -u +%F)"
+          git push
